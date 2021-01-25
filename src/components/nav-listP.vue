@@ -70,7 +70,6 @@ export default {
       getList(){
           axios.get('/api/com/comPlace/getAll?type='+this.type).then(res=>{
               let list = res.data.data;
-              console.log(list)
                     this.cureeList = [];
               list.forEach((item,i)=>{
                         var lj = this.distance(this.latitude,this.longitude,item.latitude,item.longitude)
@@ -83,6 +82,17 @@ export default {
       },
     tabCheck(i){
       this.index = i;
+      if(i === 1){
+        this.type = '停车场';
+        this.$emit('checkType','停车场')
+      }else if(i === 2){
+        this.type = '高铁';
+        this.$emit('checkType','高铁')
+      }else if(i === 3){
+        this.type = '飞机';
+        this.$emit('checkType','飞机')
+      }
+      this.getList()
     },
       distance(la1, lo1, la2, lo2){
           var La1 = la1 * Math.PI / 180.0;

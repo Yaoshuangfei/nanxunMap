@@ -1,7 +1,7 @@
 <template>
   <div class="home">
 	<markers-details v-if="details" :info="formData"></markers-details>
-	<nav-list-p  :list="navInfoList" v-if="navListShow"></nav-list-p>
+	<nav-list-p  :list="navInfoList" v-if="navListShow" @checkType="checkType"></nav-list-p>
     <div id="container" style="width: 100%;height: 100%;">
 	</div>
 	<div class="selectDrap defientD" v-if="dropShow">
@@ -89,49 +89,18 @@ export default {
 			}
 			this.dropBtn(true)
 		}
-		// else{
-		// 	this.trafficLayer.hide();
-		// 	// this.xxxx = false;
-		// }
 	},
-	/**
-	 * 
-	 * type点击
-	//  */
-	// typeClick(type,key){
-	// 	if(this.addMarkers.length > 0){
-	// 		this.removeMarkers()
-	// 	}
-	// 	this.type = type;
-	// 	this.navInfoList = [];
-	// 	console.log('----',type,key)
-	// 	if(key){
-	// 		this.getList();
-	// 	}else{
-	// 		this.facilitiesFun();
-	// 	}
-	// },
-	/**
-	 * 设施查询
-	 */
-	facilitiesFun(){
-		axios.get('/api/com/comPoi/getAll?type='+this.type).then(res=>{
-			if(res.data.data.length > 0){
-				let list = res.data.data;
-				this.addMarkers(list);
-			}else{
-				alert('无数据');
-			}
-		}).catch(error=>{
-
-		})
+	checkType(type){
+		console.log('type',type)
+		this.type = type;
+		this.removeMarkers();
+		this.getList();
 	},
 	/**
 	 * 场所查询
 	 * 根据场所类型查询marker集合
 	 */
 	getList(){
-		console.log(this.type);
       axios.get('/api/com/comPlace/getAll?type='+this.type).then(res=>{
 			let list = res.data.data;
 			this.addMarkers(list);
@@ -160,6 +129,7 @@ export default {
 	},
 	// 添加marker集合
 	async addMarkers(list){
+
 		let _this = this;
 		this.navInfoList = list;
 		this.navListShow = true;
@@ -171,11 +141,11 @@ export default {
 				var markerContent =  '' +
 				`<div class="custom-content-marker">
 					<div class="markerText" style="width: ${12*item.name.length+10}px">${item.name}</div>
-					<img class="markerImg" src="${this.markerIMg}">
+					<img class="markerImg" src="${_this.markerIMg}">
 				</div>`
 				var marker = new AMap.Marker({
 					position: [item.longitude,item.latitude],
-					map: this.map,
+					map: _this.map,
 					// 将 html 传给 content
 					content: markerContent,
 					// 以 icon 的 [center bottom] 为原点
@@ -185,7 +155,7 @@ export default {
 				marker.on('click', function(e) {
 					_this.getTypeDetails(e.target.data);
 				});
-				this.markers.push(marker);
+				_this.markers.push(marker);
 			}
 		})
 	},
@@ -225,73 +195,9 @@ export default {
 			})
 		}
 	},
-	initMap1(){
-      	this.map = new AMap.Map('container', {
-			resizeEnable: true,
-			center: [116.405467, 39.907761],
-			zoom: 13, //地图显示的缩放级别
-			// mapStyle: "amap://styles/fc6491ecfa687b17c510ef443229e034",
-		  });
-		// 以 icon URL 的形式创建一个途经点
-		var positions = [[116.405467, 39.907761], [116.415467, 39.907761], [116.415467, 39.917761], [116.425467, 39.907761],
-			[116.385467, 39.907761]];
-		let deviceUrl = require('./..//assets/map/Unchecked/hotel.png');
-		var markerContent =  '' +
-        // '<div class="custom-content-marker">' +
-        //  '   <div class="" onclick="clearMarker()">11111</div>' +
-        // '   <img src="~@/assets/map/Unchecked/hotel.png">' +
-		// '</div>';
-		`<div class="custom-content-marker">
-			<div style="width: 100px;position: absolute;top: -20px;left: -10px;">龙门客栈</div>
-			<img style="width:30px;height:30px;" src="${deviceUrl}">
-		</div>`
-		
-		positions.forEach((item,index)=>{
-			var marker = new AMap.Marker({
-				position: item,
-				map: this.map,
-				// 将 html 传给 content
-				content: markerContent,
-				// 以 icon 的 [center bottom] 为原点
-				offset: new AMap.Pixel(-13, -30)
-			});
-			marker.zIndex = '我是第'+index;
-			marker.on('click', function(e) {
-				console.log(e.target.zIndex);
-			});
-			// var clickHandle = AMap.event.addListener(marker, 'click', function(e) {
-			// 	console.log('dianji',e.target.getExtData())
-			// 	// thit.cur =JSON.parse(JSON.stringify(e.target.getExtData()));
-			// 	// console.
-			// 	//得到的数据
-			// });
-			this.markers.push(marker);
-		})
-
-
-
-		// var marker = new AMap.Marker({
-		// 	position: [116.4,39.92],
-		// 	// 将 html 传给 content
-		// 	content: markerContent,
-		// 	// 以 icon 的 [center bottom] 为原点
-		// 	offset: new AMap.Pixel(-13, -30)
-		// });
-
-		// var clickHandle = AMap.event.addListener(marker, 'click', function(e) {
-		// 	console.log('dianji',e.target.getExtData())
-		// 	// thit.cur =JSON.parse(JSON.stringify(e.target.getExtData()));
-		// 	// console.
-		// 	//得到的数据
-		// });
-		// this.map.add(marker);
-	},
 	// 清楚markers
 	removeMarkers(){
 		this.map.remove(this.markers);
-	},
-	clearModel(e){
-		this.modelShow = e;
 	}
   },
   mounted() {
