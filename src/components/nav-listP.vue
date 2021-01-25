@@ -16,10 +16,12 @@
     </div>
     <div class="listB" v-if="index === 1" v-for="(item,i) in cureeList" :key="i">
       <div class="content" @click="showAll" >
-        <div class="topName">{{item.name}}</div>
-        <div class="positionT">{{item.address? item.address: '200m | 南浔古镇东大街38号'}}</div>
+        <div class="topName">{{item.name}} <span style="font-size: 14px;color: #999;">{{item.jl}} km</span></div>
+        <div class="positionT">{{item.address? item.address: '暂无地址'}}</div>
       </div>
-      <img class="navImg" @click="goNavFun(item)" src="@/assets/map/Unchecked/nav.png" />
+        <div class="navs" @click="goNavFun(item)">
+            <img class="navImg"  src="@/assets/map/Unchecked/nav.png" />
+        </div>
     </div>
     <div class="listB" v-if="index === 2" v-for="(item,i) in cureeList" :key="i">
       <div class="content" @click="showAll" >
@@ -38,39 +40,61 @@
   </div>
 </template>
 <script>
+    import AMap from 'AMap';
+    import axios from 'axios';
 export default {
-  props: {
-    list: {
-      type: Array,
-      default: ()=>{
-        return []
-      }
-    }
-  },
-  watch: {
-    list: {
-      handler(val) {
-        this.cureeList = [];
-        val.forEach((item,i)=>{
-          if(i<3){
-              this.cureeList.push(item)
-            }
-        })
-      }
-    }
-  },
+  // watch: {
+  //   list: {
+  //     handler(val) {
+  //       this.cureeList = [];
+  //       val.forEach((item,i)=>{
+  //           var lj = this.distance(this.latitude,this.longitude,item.latitude,item.longitude)
+  //           item['jl'] = lj
+  //             this.cureeList.push(item)
+  //       })
+  //     }
+  //   }
+  // },
   data(){
     return {
       cureeList: [],
       index: 1,
+        type:'停车场',
       show: false,
-      stop: false
+      stop: false,
+        latitude:'30.3818083',
+        longitude:'120.46955543',
     }
   },
   methods:{
+      getList(){
+          axios.get('/api/com/comPlace/getAll?type='+this.type).then(res=>{
+              let list = res.data.data;
+              console.log(list)
+                    this.cureeList = [];
+              list.forEach((item,i)=>{
+                        var lj = this.distance(this.latitude,this.longitude,item.latitude,item.longitude)
+                        item['jl'] = lj
+                          this.cureeList.push(item)
+                    })
+          }).catch(error=>{
+
+          })
+      },
     tabCheck(i){
       this.index = i;
     },
+      distance(la1, lo1, la2, lo2){
+          var La1 = la1 * Math.PI / 180.0;
+          var La2 = la2 * Math.PI / 180.0;
+          var La3 = La1 - La2;
+          var Lb3 = lo1 * Math.PI / 180.0 - lo2 * Math.PI / 180.0;
+          var s = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(La3 / 2), 2) + Math.cos(La1) * Math.cos(La2) * Math.pow(Math.sin(Lb3 / 2), 2)));
+          s = s * 6378.137;
+          s = Math.round(s * 10000) / 10000;
+          s = s.toFixed(2);
+          return s;
+      },
     showAll(){
       if(this.cureeList.length === this.list.length){
         this.cureeList = [
@@ -83,6 +107,18 @@ export default {
       }
     },
     goNavFun(data){
+        wx.miniProgram.navigateTo({
+            url:'/pages/Navigation/Navigation?latitude='+data.latitude+'&longitude='+data.longitude+'&address='+data.address,
+            success: function(){
+                console.log('success')
+            },
+            fail: function(){
+                console.log('fail');
+            },
+            complete:function(){
+                console.log('complete');
+            }
+        });
       // console.log(data.name)
       // wx.openLocation({
       //   latitude: 0, // 纬度，浮点数，范围为90 ~ -90
@@ -92,33 +128,29 @@ export default {
       //   scale: 1, // 地图缩放级别,整形值,范围从1~28。默认为最大
       //   infoUrl: '' // 在查看位置界面底部显示的超链接,可点击跳转
       // });
-      wx.getLocation({
-        type: 'wgs84', // 默认为wgs84的gps坐标，如果要返回直接给openLocation用的火星坐标，可传入'gcj02'
-        success: function (res) {
-            var latitude = res.latitude; // 纬度，浮点数，范围为90 ~ -90
-            var longitude = res.longitude; // 经度，浮点数，范围为180 ~ -180。
-            var speed = res.speed; // 速度，以米/每秒计
-            var accuracy = res.accuracy; // 位置精度
-            console.log(res)
-        }
-      });
+      // wx.getLocation({
+      //   type: 'wgs84', // 默认为wgs84的gps坐标，如果要返回直接给openLocation用的火星坐标，可传入'gcj02'
+      //   success: function (res) {
+      //       var latitude = res.latitude; // 纬度，浮点数，范围为90 ~ -90
+      //       var longitude = res.longitude; // 经度，浮点数，范围为180 ~ -180。
+      //       var speed = res.speed; // 速度，以米/每秒计
+      //       var accuracy = res.accuracy; // 位置精度
+      //       console.log(res)
+      //   }
+      // });
     }
   },
   created() {
-      this.cureeList = [];
-      this.list.forEach((item,i)=>{
-        if(i<3){
-            this.cureeList.push(item)
-          }
-      })
+      this.getList();
   }
 };
 </script>
 <style scoped>
+    .navs {position: absolute;z-index: 9999;width: 80px;right:0;top:0;height:100%;}
 .details{
   position: absolute;
   /* width: 357px; */
-  /* height: 246px; */
+   height: 278px;
   width: calc(100% - 20px);
   overflow: auto;
   max-height: 550px;

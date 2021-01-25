@@ -1,11 +1,6 @@
 <template>
   <div class="home">
 	<div class="topTitle flexd">
-		<!-- <div class="adder" :class="{activeNav: activeIndex === 0}" @click="activeFun(0)">景点</div> -->
-		<!-- <div class="adder" :class="{activeNav: activeIndex === 1}" @click="activeFun(1)">美食</div>
-		<div class="adder" :class="{activeNav: activeIndex === 2}" @click="activeFun(2)">住宿</div>
-		<div class="adder" :class="{activeNav: activeIndex === 12}" @click="activeFun(12)">服务</div>
-		<div class="adder" :class="{activeNav: activeIndex === 7}" @click="activeFun(7)">停车</div> -->
 		<!-- <div class="swiperW"> -->
 			<swiper class="swiperW" :options="swiperOption">
 				<swiper-slide class="adder" :class="{activeNav: activeIndex === 0}" >
@@ -33,7 +28,7 @@
 					<div  @click="activeFun(12)">服务</div>
 				</swiper-slide>
 				<swiper-slide class="adder" :class="{activeNav: activeIndex === 8}">
-					<div  @click="activeFun(8)">休息点</div>
+					<div  @click="activeFun(8)" style="font-size: 12px;">游客休息点</div>
 				</swiper-slide>
 				<swiper-slide class="adder" :class="{activeNav: activeIndex === 9}">
 					<div  @click="activeFun(9)">报警柱</div>
@@ -49,7 +44,7 @@
 				</swiper-slide>
 			</swiper>
 		<!-- </div> -->
-		<div class="adder">
+		<div class="adder" style="width: 80px;padding: 0 3px;">
 			<div @click="clearModel(true)">更多</div>
 			<!-- <img    src="@/assets/map/more.png" /> -->
 		</div>
@@ -134,6 +129,12 @@
 		<img class="peripheryImg" @click="refresh = false" v-if="refresh" src="@/assets/map/fun/refresh.png" />
 		<img class="peripheryImg" @click="refresh = true" v-else src="@/assets/map/fun/refresh1.png" />
 	</div>
+      <div class="alert" v-if="fixeds">
+          <div class="alertMain">
+              <div class="alertMain01">提示</div>
+              <div class="alertMain02">暂无无数据！</div>
+          </div>
+      </div>
   </div>
 </template>
 
@@ -153,6 +154,7 @@ export default {
   },
   data(){
     return {
+        fixeds: false,
 		periphery: true,
 		live: true,
 		headset: true,
@@ -182,11 +184,14 @@ export default {
 		navInfoList:[],
 		type: '景点',
 		showType: 0,
+        lhg:'',
 		formData:{
 			showType: 0,
 			lableText: '',
 			stopShow: false
-		}
+		},
+        latitude:'',
+        longitude:'',
      }
   },
   methods: {
@@ -233,6 +238,17 @@ export default {
 		// 	// this.xxxx = false;
 		// }
 	},
+      distance(la1, lo1, la2, lo2){
+          var La1 = la1 * Math.PI / 180.0;
+          var La2 = la2 * Math.PI / 180.0;
+          var La3 = La1 - La2;
+          var Lb3 = lo1 * Math.PI / 180.0 - lo2 * Math.PI / 180.0;
+          var s = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(La3 / 2), 2) + Math.cos(La1) * Math.cos(La2) * Math.pow(Math.sin(Lb3 / 2), 2)));
+          s = s * 6378.137;
+          s = Math.round(s * 10000) / 10000;
+          s = s.toFixed(2);
+          return s;
+      },
 	/**
 	 * 
 	 * type点击
@@ -243,7 +259,6 @@ export default {
 		}
 		this.type = type;
 		this.navInfoList = [];
-		console.log('----',type,key)
 		if(key){
 			this.getList();
 		}else{
@@ -259,7 +274,8 @@ export default {
 				let list = res.data.data;
 				this.addMarkers(list);
 			}else{
-				alert('无数据');
+				// alert('无数据');
+                this.fixeds = true;
 			}
 		}).catch(error=>{
 
@@ -291,6 +307,20 @@ export default {
 		});
 		this.trafficLayer.setMap(this.map);
 		this.trafficLayer.hide();
+        if(navigator.geolocation){
+            navigator.geolocation.getCurrentPosition(
+                function (position) {
+                    var latitude = position.coords.latitude;
+                    var longitude = position.coords.longitude;
+                    this.latitude = latitude;
+                    this.longitude = longitude;
+                },
+                function (err) {
+                    alert("您的浏览器不支持此项技术")
+                },
+                {timeout : 6000}
+            )
+        }
 	},
 	// markerImg 删选
 	initImg(){
@@ -354,6 +384,8 @@ export default {
 		list.forEach((item)=>{
 			if(item.longitude && item.latitude){
 				let point = [item.longitude,item.latitude]
+                var lj = this.distance(this.latitude,this.longitude,item.latitude,item.longitude)
+                item['jl'] = lj
 				var markerContent =  '' +
 				// '<div class="custom-content-marker">' +
 				//  '   <div class="" onclick="clearMarker()">11111</div>' +
@@ -361,7 +393,7 @@ export default {
 				// '</div>';
 				`<div class="custom-content-marker">
 					<div class="markerText" style="width: ${12*item.name.length+55}px">${item.name} 
-					<span style="color: #F47668;position: absolute;right: 10px;">2.3km</span>
+					<span style="color: #F47668;position: absolute;right: -5px;">${item.jl} km</span>
 					</div>
 					<img class="markerImg" src="${this.markerIMg}">
 				</div>`
@@ -461,8 +493,6 @@ export default {
 			this.markers.push(marker);
 		})
 
-
-
 		// var marker = new AMap.Marker({
 		// 	position: [116.4,39.92],
 		// 	// 将 html 传给 content
@@ -488,6 +518,7 @@ export default {
 	},
 	activeFun(i){
 		console.log(i);
+        this.fixeds = false;
 		this.activeIndex = i;
 		this.formData.stopShow = false;
 		this.details = false;
@@ -594,6 +625,10 @@ export default {
 };
 </script>
 <style scoped>
+    .alert {position: fixed;z-index: 999999;width: 100%;height:100%;background: rgba(0,0,0,.4);top:43px;left:0;}
+    .alertMain {width: 300px;height:150px;position: relative;margin:-150px auto 0;background: #fff;border-radius: 10px;top:50%;}
+    .alertMain01 {width: 100%;text-align: center;line-height: 90px;}
+    .alertMain02 {width: 100%;text-align: center;font-size: 18px;}
 .topTitle{
 	width: 100%;
 	height: 43px;
@@ -615,7 +650,7 @@ border-radius: 13px;
 	padding-left: 10px;
 }
 .adder{
-	width: 80px;
+	/*width: 80px;*/
 	height: 25px;
     line-height: 25px;
 	text-align: center;
