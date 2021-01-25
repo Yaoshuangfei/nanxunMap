@@ -156,7 +156,7 @@ export default {
       	this.map = new AMap.Map('container', {
 			resizeEnable: true,
 			center: [120.42575639,30.87733871],
-			zoom: 30, //地图显示的缩放级别
+			zoom: 16, //地图显示的缩放级别
 			// zoom: 18, //地图显示的缩放级别
 			// mapStyle: "amap://styles/fc6491ecfa687b17c510ef443229e034",
 		});
