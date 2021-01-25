@@ -46,7 +46,7 @@ export default {
 		bottomName: '影像地图',
 		dropShow: true,
 		modelShow: false,
-		activeIndex: 0,
+		activeIndex: 13,
 		details:false,
 		navListShow: false,
 		trafficLayer: null,
@@ -54,8 +54,8 @@ export default {
 		map: null,
 		markers: [],
 		navInfoList:[],
-		type: '景点',
-		showType: 0,
+		type: '停车场',
+		showType: 2,
 		formData:{
 			showType: 0,
 			lableText: '',
@@ -65,20 +65,7 @@ export default {
   },
   methods: {
 	resetWx(){
-		// this.$router.push({path:'/shamap'})
 		window.location.href="https://nanxun.zjtoprs.com/drawing"
-		// wx.miniProgram.navigateTo({
-		// 	url:'/pages/handPainted/index',
-		// 	success: function(){
-		// 		console.log('success')
-		// 	},
-		// 	fail: function(){
-		// 		console.log('fail');
-		// 	},
-		// 	complete:function(){
-		// 		console.log('complete');
-		// 	}
-		// });
 	},
 	/**
 	 * 地图切换
@@ -110,20 +97,20 @@ export default {
 	/**
 	 * 
 	 * type点击
-	 */
-	typeClick(type,key){
-		if(this.addMarkers.length > 0){
-			this.removeMarkers()
-		}
-		this.type = type;
-		this.navInfoList = [];
-		console.log('----',type,key)
-		if(key){
-			this.getList();
-		}else{
-			this.facilitiesFun();
-		}
-	},
+	//  */
+	// typeClick(type,key){
+	// 	if(this.addMarkers.length > 0){
+	// 		this.removeMarkers()
+	// 	}
+	// 	this.type = type;
+	// 	this.navInfoList = [];
+	// 	console.log('----',type,key)
+	// 	if(key){
+	// 		this.getList();
+	// 	}else{
+	// 		this.facilitiesFun();
+	// 	}
+	// },
 	/**
 	 * 设施查询
 	 */
@@ -144,6 +131,7 @@ export default {
 	 * 根据场所类型查询marker集合
 	 */
 	getList(){
+		console.log(this.type);
       axios.get('/api/com/comPlace/getAll?type='+this.type).then(res=>{
 			let list = res.data.data;
 			this.addMarkers(list);
@@ -168,47 +156,6 @@ export default {
 	},
 	// markerImg 删选
 	initImg(){
-		// let img = '';
-		// if(this.activeIndex === 0){
-		// 	//景点
-		// 	this.markerIMg = require('./../assets/map/Unchecked/scenic_spot.png');
-		// }else if(this.activeIndex === 1){
-		// 	//美食
-		// 	this.markerIMg = require('./../assets/map/Unchecked/restaurant.png');
-		// }else if(this.activeIndex === 2){
-		// 	//酒店
-		// 	this.markerIMg = require('./../assets/map/Unchecked/hotel.png');
-		// }else if(this.activeIndex === 3){
-		// 	//语音
-		// 	this.markerIMg = require('./../assets/map/Unchecked/yuyin.png');
-		// }else if(this.activeIndex === 4){
-		// 	//演出点
-		// 	this.markerIMg = require('./../assets/map/Unchecked/yanchu.png');
-		// }else if(this.activeIndex === 5){
-		// 	//游船
-		// 	this.markerIMg = require('./../assets/map/Unchecked/matou.png');
-		// }else if(this.activeIndex === 6){
-		// 	//厕所
-		// 	this.markerIMg = require('./../assets/map/Unchecked/wc.png');
-		// }else if(this.activeIndex === 7){
-		// 	//停车场
-		// 	this.markerIMg = require('./../assets/map/Unchecked/p.png');
-		// }else if(this.activeIndex === 8){
-		// 	//游客休息点
-		// 	this.markerIMg = require('./../assets/map/Unchecked/qixi.png');
-		// }else if(this.activeIndex === 9){
-		// 	//报警柱
-		// 	this.markerIMg = require('./../assets/map/Unchecked/bj.png');
-		// }else if(this.activeIndex === 10){
-		// 	//AED急救
-		// 	this.markerIMg = require('./../assets/map/Unchecked/sos.png');
-		// }else if(this.activeIndex === 11){
-		// 	//游客
-		// 	this.markerIMg = require('./../assets/map/Unchecked/zhong.png');
-		// }else if(this.activeIndex === 12){
-		// 	//志愿服务站
-		// 	this.markerIMg = require('./../assets/map/Unchecked/server.png');
-		// }
 		this.markerIMg = require('./../assets/map/Unchecked/p.png');
 	},
 	// 添加marker集合
@@ -218,19 +165,10 @@ export default {
 		this.navListShow = true;
 		this.markers = [];
 		await this.initImg();
-		// if(list.length > 0){
-		// 	if(list[0].longitude && list[0].latitude){
-		// 		AMap.setPointToCenter(list[0].longitude, list[0].latitude)
-		// 	}
-		// }
 		list.forEach((item)=>{
 			if(item.longitude && item.latitude){
 				let point = [item.longitude,item.latitude]
 				var markerContent =  '' +
-				// '<div class="custom-content-marker">' +
-				//  '   <div class="" onclick="clearMarker()">11111</div>' +
-				// '   <img src="~@/assets/map/Unchecked/hotel.png">' +
-				// '</div>';
 				`<div class="custom-content-marker">
 					<div class="markerText" style="width: ${12*item.name.length+10}px">${item.name}</div>
 					<img class="markerImg" src="${this.markerIMg}">
@@ -255,7 +193,6 @@ export default {
 	 * 根据markerID获取详情
 	 */
 	getTypeDetails(obj){
-		console.log('-----',obj,this.activeIndex)
 		let listIndex = [3,4,6,9,10,12];
 		
 		if(listIndex.indexOf(this.activeIndex) >= 0){
@@ -355,91 +292,6 @@ export default {
 	},
 	clearModel(e){
 		this.modelShow = e;
-	},
-	activeFun(i){
-		console.log(i);
-		this.activeIndex = i;
-		this.formData.stopShow = false;
-		this.details = false;
-		let type = '景点';
-		let key = false;
-		switch(i){
-			case 0:
-				type = '景点';
-				key = true;
-				this.showType = 0;
-				break;
-			case 1:
-				type = '美食餐饮';
-				key = true;
-				this.showType = 1;
-				this.formData.lableText = '特色店铺';
-				break;
-			case 2:
-				type = '度假酒店';
-				key = true;
-				this.showType = 1;
-				this.formData.lableText = '五星级酒店';
-				// type = '精品民宿'  
-				break;
-			case 3:
-				key = false;
-				type = '语音导览服务站';
-				this.showType = 2;
-				break;
-			case 4:
-				// 222
-				key = false;
-				type = '演出点';
-				this.showType = 2;
-				break;
-			case 5:
-				type = '码头';
-				key = true;
-				this.showType = 2;
-				break;
-			case 6:
-				// 2222
-				key = false;
-				type = '厕所';
-				this.showType = 2;
-				break;
-			case 7:
-				type = '停车场';
-				key = true;
-				this.showType = 2;
-				this.formData.stopShow = true;
-				break;
-			case 8:
-				type = '游客休息点';
-				key = true;
-				this.showType = 2;
-				break;
-			case 9:
-				// 2222 
-				key = false;
-				type = '报警柱';
-				this.showType = 2;
-				break;
-			case 10:
-				// 2222
-				key = false;
-				type = 'AED急救箱';
-				this.showType = 2;
-				break;
-			case 11:
-				type = '游客中心';
-				key = true;
-				this.showType = 2;
-				break;
-			case 12:
-				// 2222
-				key = false;
-				type = '志愿服务站';
-				this.showType = 2;
-				break;
-		}
-		this.typeClick(type,key);
 	}
   },
   mounted() {
