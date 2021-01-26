@@ -25,15 +25,15 @@
     </div>
     <div class="listB" v-if="index === 2" v-for="(item,i) in cureeList" :key="i">
       <div class="content" @click="showAll" >
-        <div class="topName">{{item.name}}</div>
-        <div class="positionT">{{item.address? item.address: '200m | 南浔古镇东大街38号'}}</div>
+        <div class="topName">{{item.name}} <span style="font-size: 14px;color: #999;">{{item.jl}} km</span></div>
+        <div class="positionT">{{item.address? item.address: '暂无地址'}}</div>
       </div>
       <img class="navImg" @click="goNavFun(item)" src="@/assets/map/Unchecked/nav.png" />
     </div>
     <div class="listB" v-if="index === 3" v-for="(item,i) in cureeList" :key="i">
       <div class="content" @click="showAll" >
-        <div class="topName">{{item.name}}</div>
-        <div class="positionT">{{item.address? item.address: '200m | 南浔古镇东大街38号'}}</div>
+        <div class="topName">{{item.name}} <span style="font-size: 14px;color: #999;">{{item.jl}} km</span></div>
+        <div class="positionT">{{item.address? item.address: '暂无地址'}}</div>
       </div>
       <img class="navImg" @click="goNavFun(item)" src="@/assets/map/Unchecked/nav.png" />
     </div>
@@ -62,8 +62,8 @@ export default {
         type:'停车场',
       show: false,
       stop: false,
-        latitude:'30.3818083',
-        longitude:'120.46955543',
+        latitude:'',
+        longitude:'',
     }
   },
   methods:{
@@ -152,6 +152,20 @@ export default {
   },
   created() {
       this.getList();
+      if(navigator.geolocation){
+          navigator.geolocation.getCurrentPosition(
+              function (position) {
+                  var latitude = position.coords.latitude;
+                  var longitude = position.coords.longitude;
+                  this.latitude = latitude;
+                  this.longitude = longitude;
+              },
+              function (err) {
+                  alert("您的浏览器不支持此项技术")
+              },
+              {timeout : 6000}
+          )
+      }
   }
 };
 </script>

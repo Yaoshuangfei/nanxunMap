@@ -197,19 +197,19 @@ export default {
   methods: {
 	resetWx(){
 		// this.$router.push({path:'/shamap'})
-		window.location.href="https://nanxun.zjtoprs.com/drawing"
-		// wx.miniProgram.navigateTo({
-		// 	url:'/pages/handPainted/index',
-		// 	success: function(){
-		// 		console.log('success')
-		// 	},
-		// 	fail: function(){
-		// 		console.log('fail');
-		// 	},
-		// 	complete:function(){
-		// 		console.log('complete');
-		// 	}
-		// });
+		// window.location.href="https://nanxun.zjtoprs.com/drawing"
+		wx.miniProgram.navigateTo({
+			url:'/pages/webMap/map',
+			success: function(){
+				console.log('success')
+			},
+			fail: function(){
+				console.log('fail');
+			},
+			complete:function(){
+				console.log('complete');
+			}
+		});
 	},
 	/**
 	 * 地图切换
