@@ -14,28 +14,34 @@
         <div class="test_b" v-show="index === 3"></div>
       </div>
     </div>
-    <div class="listB" v-if="index === 1" v-for="(item,i) in cureeList" :key="i">
-      <div class="content" @click="showAll" >
-        <div class="topName">{{item.name}} <span style="font-size: 14px;color: #999;">{{item.jl}} km</span></div>
-        <div class="positionT">{{item.address? item.address: '暂无地址'}}</div>
-      </div>
-        <div class="navs" @click="goNavFun(item)">
-            <img class="navImg"  src="@/assets/map/Unchecked/nav.png" />
+    <div style="overflow: auto;height: 251px;">
+      <div class="listB" v-if="index === 1" v-for="(item,i) in cureeList" :key="i">
+        <div class="content" @click="showAll" >
+          <div class="topName">{{item.name}} <span style="font-size: 14px;color: #999;">{{item.jl}} km</span></div>
+          <div class="positionT">{{item.address? item.address: '暂无地址'}}</div>
         </div>
-    </div>
-    <div class="listB" v-if="index === 2" v-for="(item,i) in cureeList" :key="i">
-      <div class="content" @click="showAll" >
-        <div class="topName">{{item.name}} <span style="font-size: 14px;color: #999;">{{item.jl}} km</span></div>
-        <div class="positionT">{{item.address? item.address: '暂无地址'}}</div>
+          <div class="navs" @click="goNavFun(item)">
+              <img class="navImg"  src="@/assets/map/Unchecked/nav.png" />
+          </div>
       </div>
-      <img class="navImg" @click="goNavFun(item)" src="@/assets/map/Unchecked/nav.png" />
-    </div>
-    <div class="listB" v-if="index === 3" v-for="(item,i) in cureeList" :key="i">
-      <div class="content" @click="showAll" >
-        <div class="topName">{{item.name}} <span style="font-size: 14px;color: #999;">{{item.jl}} km</span></div>
-        <div class="positionT">{{item.address? item.address: '暂无地址'}}</div>
+      <div class="listB" v-if="index === 2" v-for="(item,i) in cureeList" :key="i">
+        <div class="content" @click="showAll" >
+          <div class="topName">{{item.name}} 
+            <!-- <span style="font-size: 14px;color: #999;">{{item.jl}}</span> -->
+          </div>
+          <div class="positionT"  style="width: 90%;">{{item.content? item.content: '暂无地址'}}</div>
+        </div>
+        <img class="navImg" @click="goNavFun(item)" src="@/assets/map/Unchecked/nav.png" />
       </div>
-      <img class="navImg" @click="goNavFun(item)" src="@/assets/map/Unchecked/nav.png" />
+      <div class="listB" v-if="index === 3" v-for="(item,i) in cureeList" :key="i">
+        <div class="content" @click="showAll" >
+          <div class="topName">{{item.name}} 
+            <!-- <span style="font-size: 14px;color: #999;">{{item.jl}} km</span> -->
+          </div>
+          <div class="positionT" style="width: 90%;">{{item.content? item.content: '暂无地址'}}</div>
+        </div>
+        <img class="navImg" @click="goNavFun(item)" src="@/assets/map/Unchecked/nav.png" />
+      </div>
     </div>
   </div>
 </template>
@@ -68,6 +74,8 @@ export default {
   },
   methods:{
       getList(){
+        // /api/com/comInfo/getInfoByName?name
+        // api/com/comPlace/getAll
           axios.get('/api/com/comPlace/getAll?type='+this.type).then(res=>{
               let list = res.data.data;
                     this.cureeList = [];
@@ -82,18 +90,30 @@ export default {
       },
     tabCheck(i){
       this.index = i;
+      this.cureeList = [];
       if(i === 1){
         this.type = '停车场';
+        this.getList();
         this.$emit('checkType','停车场')
       }else if(i === 2){
         this.type = '高铁';
+        this.getNameInfo();
         this.$emit('checkType','高铁')
       }else if(i === 3){
         this.type = '飞机';
+        this.getNameInfo();
         this.$emit('checkType','飞机')
       }
-      this.getList()
     },
+    getNameInfo(){
+        
+        axios.get('/api/com/comInfo/getInfoByName?name='+this.type).then(res=>{
+          console.log('-----',res)
+          this.cureeList.push(res.data.data);
+        }).catch(error=>{
+
+        })
+      },
       distance(la1, lo1, la2, lo2){
           var La1 = la1 * Math.PI / 180.0;
           var La2 = la2 * Math.PI / 180.0;
@@ -174,9 +194,9 @@ export default {
 .details{
   position: absolute;
   /* width: 357px; */
-   height: 278px;
+   /* height: 278px; */
   width: calc(100% - 20px);
-  overflow: auto;
+  /* overflow: auto; */
   max-height: 550px;
   padding-bottom: 14px;
   background: #FFFFFF;

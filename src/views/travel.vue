@@ -92,10 +92,21 @@ export default {
 	},
 	checkType(type){
 		console.log('type',type)
-		this.type = type;
 		this.removeMarkers();
-		this.getList();
+		if(type === '停车场'){
+			this.type = type;
+			this.getList();
+		}
 	},
+	// getNameInfo(type){
+	// 	axios.get('/api/com/comInfo/getInfoByName?name='+type).then(res=>{
+	// 		console.log('-----',res)
+	// 		let list = res.data.data;
+	// 		this.addMarkers(list);
+	// 	}).catch(error=>{
+
+	// 	})
+	// },
 	/**
 	 * 场所查询
 	 * 根据场所类型查询marker集合
