@@ -134,20 +134,20 @@ export default {
           item['jl'] = lj
             this.cureeList.push(item)
       })
-      if(navigator.geolocation){
-          navigator.geolocation.getCurrentPosition(
-              function (position) {
-                  var latitude = position.coords.latitude;
-                  var longitude = position.coords.longitude;
-                  this.latitude = latitude;
-                  this.longitude = longitude;
-              },
-              function (err) {
-                  alert("您的浏览器不支持此项技术")
-              },
-              {timeout : 6000}
-          )
-      }
+      // if(navigator.geolocation){
+      //     navigator.geolocation.getCurrentPosition(
+      //         function (position) {
+      //             var latitude = position.coords.latitude;
+      //             var longitude = position.coords.longitude;
+      //             this.latitude = latitude;
+      //             this.longitude = longitude;
+      //         },
+      //         function (err) {
+      //             alert("您的浏览器不支持此项技术")
+      //         },
+      //         {timeout : 6000}
+      //     )
+      // }
   }
 };
 </script>

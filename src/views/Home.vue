@@ -294,10 +294,33 @@ export default {
       })
 	},
 	// 地图初始化
+	getPstion(){
+		const _this = this;
+		if(navigator.geolocation){
+            navigator.geolocation.getCurrentPosition(
+                function (position) {
+					console.log(position)
+                    _this.latitude = position.coords.latitude;
+					_this.longitude = position.coords.longitude;
+					_this.initMap();
+                },
+                function (err) {
+					// _this.longitude = 120.42575639;
+					// _this.latitude = 30.87733871;
+					alert("您的浏览器不支持此项技术")
+					// _this.initMap();
+                },
+                {timeout : 6000}
+            )
+		}
+	},
     initMap() {
+		let center = [this.longitude,this.latitude];
+		// let center = [120.42575639,30.87733871]
+		console.log(center)
       	this.map = new AMap.Map('container', {
 			resizeEnable: true,
-			center: [120.42575639,30.87733871],
+			center: center,//[120.42575639,30.87733871]
 			zoom: 30, //地图显示的缩放级别
 			// zoom: 18, //地图显示的缩放级别
 			// mapStyle: "amap://styles/fc6491ecfa687b17c510ef443229e034",
@@ -307,20 +330,19 @@ export default {
 		});
 		this.trafficLayer.setMap(this.map);
 		this.trafficLayer.hide();
-        if(navigator.geolocation){
-            navigator.geolocation.getCurrentPosition(
-                function (position) {
-                    var latitude = position.coords.latitude;
-                    var longitude = position.coords.longitude;
-                    this.latitude = latitude;
-                    this.longitude = longitude;
-                },
-                function (err) {
-                    alert("您的浏览器不支持此项技术")
-                },
-                {timeout : 6000}
-            )
-        }
+		this.getList();
+		// let imgss = require('./../assets/map/Unchecked/p.png');
+		// var markerContent = `<div class="custom-content-marker">
+		// 			<img class="markerImg" src="${imgss}">
+		// 		</div>`
+		// var marker = new AMap.Marker({
+		// 	position: center,
+		// 	// 将 html 传给 content
+		// 	content: markerContent,
+		// 	// 以 icon 的 [center bottom] 为原点
+		// 	offset: new AMap.Pixel(0, 0)
+		// });
+		// this.map.add(marker);
 	},
 	// markerImg 删选
 	initImg(){
@@ -417,7 +439,6 @@ export default {
 	 * 根据markerID获取详情
 	 */
 	getTypeDetails(obj){
-		console.log('-----',obj,this.activeIndex)
 		let listIndex = [3,4,6,9,10,12,13];
 		
 		if(listIndex.indexOf(this.activeIndex) >= 0){
@@ -619,8 +640,7 @@ export default {
 	// 		'updateTimelineShareData'
 	// 	] // 必填，需要使用的JS接口列表
 	// });
-    this.initMap();
-    this.getList();
+	this.getPstion();
   }
 };
 </script>
