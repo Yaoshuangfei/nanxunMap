@@ -1,8 +1,9 @@
 node_modules/
 dist/
 .history/
-dist.rar
+/dist.rar
 .idea/
+/dist.zip
 # Other files and folders
 # .settings/
 
