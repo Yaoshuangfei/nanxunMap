@@ -305,18 +305,18 @@ export default {
 					_this.initMap();
                 },
                 function (err) {
-					// _this.longitude = 120.42575639;
-					// _this.latitude = 30.87733871;
+					_this.longitude = 120.42575639;
+					_this.latitude = 30.87733871;
 					alert("您的浏览器不支持此项技术")
-					// _this.initMap();
+					_this.initMap();
                 },
                 {timeout : 6000}
             )
 		}
 	},
     initMap() {
-		let center = [this.longitude,this.latitude];
-		// let center = [120.42575639,30.87733871]
+		// let center = [this.longitude,this.latitude];
+		let center = [120.42575639,30.87733871]
 		console.log(center)
       	this.map = new AMap.Map('container', {
 			resizeEnable: true,
